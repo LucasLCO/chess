@@ -14,10 +14,18 @@ class Piece(ABC):
     def possible_movement(self) -> tuple:
         pass
 
+class PiecesFactory(ABC):
+    @abstractmethod
+    def get_white_piece(self) -> Piece:
+        pass
+
+    @abstractmethod
+    def get_black_piece(self) -> Piece:
+        pass   
+
 @dataclass
 class Pawn(Piece):
     value: int = field(default=1, init=False, repr=False)
 
     def possible_movement(self) -> tuple:
         pass
-
