@@ -10,7 +10,11 @@ def is_white(coordx:int, coordy:int) -> bool:
 class Tile:
     coordx: int
     coordy: int
-    white: bool = field(init=False)
 
-    def __post_init__(self):
-        self.white = is_white(self.coordx, self.coordy)
+    @property
+    def white(self) -> bool:
+        return is_white(self.coordx, self.coordy)
+
+
+class TilesFactory():
+    pass
