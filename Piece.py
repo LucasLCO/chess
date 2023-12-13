@@ -29,3 +29,10 @@ class Pawn(Piece):
 
     def possible_movement(self) -> tuple:
         pass
+
+class PawnFactory(PiecesFactory):
+    def get_white_piece(self, tile:Tile) -> Piece:
+        return Pawn(tile, True)
+
+    def get_black_piece(self, tile:Tile) -> Piece:
+        return Pawn(tile, False)
