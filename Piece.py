@@ -4,11 +4,6 @@ from typing import Type
 from Tile import Tile
 
 
-# Make an named tuple to create the
-# instaces of the pices to not have
-# to import all pieces types, just
-# the factory to create the pieces
-
 @dataclass
 class Piece(ABC):
     tile: Type[Tile]
