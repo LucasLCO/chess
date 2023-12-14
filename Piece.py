@@ -1,14 +1,13 @@
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
-from typing import Protocol, Type
+from typing import Type
 from Tile import Tile
-from Move import Move
 
 
-# Make an named tuple to create the 
-# instaces of the pices to not have 
+# Make an named tuple to create the
+# instaces of the pices to not have
 # to import all pieces types, just
-# the factory to create the pieces 
+# the factory to create the pieces
 
 @dataclass
 class Piece(ABC):
@@ -56,7 +55,16 @@ class Queen(Piece):
         pass
 
 class PieceFactory:
-    def get_piece(self, piece_type: Type[Piece],
-                tile: Tile, is_white: bool) -> Piece:
+    factories = {
+        "pawn": Pawn,
+        "knight": Knight,
+        "bishop": Bishop,
+        "rook": Rook,
+        "queen": Queen,
+    }
 
-        return piece_type(tile, is_white)
+    def __call__(self, piece_type: str, tile: Tile,
+                    is_white: bool) -> Piece:
+
+        piece_class = self.factories[piece_type]
+        return piece_class(tile, is_white)
