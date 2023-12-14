@@ -54,6 +54,14 @@ class Queen(Piece):
     def possible_movement(self) -> tuple:
         pass
 
+@dataclass
+class King(Piece):
+    value: None = field(default=None,
+                init=False, repr=False)
+
+    def possible_movement(self) -> tuple:
+        pass
+
 class PieceFactory:
     factories = {
         "pawn": Pawn,
@@ -61,6 +69,7 @@ class PieceFactory:
         "bishop": Bishop,
         "rook": Rook,
         "queen": Queen,
+        "king": King 
     }
 
     def __call__(self, piece_type: str, tile: Tile,
