@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 def is_white(coordx:int, coordy:int) -> bool:
@@ -14,7 +14,3 @@ class Tile:
     @property
     def white(self) -> bool:
         return is_white(self.coordx, self.coordy)
-
-
-class TilesFactory():
-    pass
