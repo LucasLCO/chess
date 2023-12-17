@@ -4,11 +4,6 @@ from typing import Type, Union
 from Tile import Tile
 import json
 
-# TODO
-# See if the factory pattern is really
-# the solution here and how to improve
-# the pieces_locationd function and implement
-# the get piece on Board function
 
 def tiles_factory(tile: Type[Tile]) -> list:
     return [[tile(x, y)
@@ -57,8 +52,15 @@ class Board:
     def pieces(self):
         return self._pieces.copy()
 
-    def get_piece(self, white:bool, piece_name:str, coordx, coordy) -> Piece:
-        for piece in self._pieces["white" if white else "black"][piece_name]:
+    def get_white_piece(self, piece_name:str, coordx, coordy) -> Union[Piece, None]:
+        for piece in self._pieces["white"][piece_name]:
+            if piece.tile.coordx == coordx and piece.tile.coordy == coordy:
+                return piece
+
+        return None
+            
+    def get_black_piece(self, piece_name:str, coordx, coordy) -> Union[Piece, None]:
+        for piece in self._pieces["black"][piece_name]:
             if piece.tile.coordx == coordx and piece.tile.coordy == coordy:
                 return piece
 
