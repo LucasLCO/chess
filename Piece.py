@@ -6,6 +6,7 @@ from Tile import Tile
 
 @dataclass
 class Piece(ABC):
+    name: str = field(repr=False)
     tile: Type[Tile]
     white: bool
     value: int = field(init=False)
@@ -64,16 +65,16 @@ class King(Piece):
 
 class PieceFactory:
     factories = {
-        "pawn": Pawn,
-        "knight": Knight,
-        "bishop": Bishop,
-        "rook": Rook,
-        "queen": Queen,
-        "king": King 
+        "pawn": (Pawn, "P"),
+        "knight": (Knight, "N"),
+        "bishop": (Bishop, "B"),
+        "rook": (Rook, "R"),
+        "queen": (Queen, "Q"),
+        "king": (King, "K") 
     }
 
     def __call__(self, piece_type: str, tile: Tile,
                     is_white: bool) -> Piece:
 
-        piece_class = self.factories[piece_type]
-        return piece_class(tile, is_white)
+        piece_class, piece_name = self.factories[piece_type]
+        return piece_class(piece_name, tile, is_white)
