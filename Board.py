@@ -1,32 +1,43 @@
 from dataclasses import dataclass, field
 from Piece import PieceFactory, Piece
-from typing import Type
+from typing import Type, Union
 from Tile import Tile
+import json
 
+# TODO
+# See if the factory pattern is really
+# the solution here and how to improve
+# the pieces_locationd function and implement
+# the get piece on Board function
 
 def tiles_factory(tile: Type[Tile]) -> list:
     return [[tile(x, y)
-            for x in range(9)]
-            for y in range(9)]
+            for x in range(8)]
+            for y in range(8)]
 
-def pieces_position(tiles: list, piece_factory: PieceFactory) -> dict:
-    pieces = {"white": [],
-              "black": []}
-    
-    pieces_ord_list = ["rook", "knight", "bishop", "queen",
-                    "king", "bishop", "knight", "rook"]
+def load_pieces(path:str) -> dict:
+    with open(path) as file:
+        pieces = json.load(file)
 
-    for wp_tile, bp_tile, piece in zip(tiles[0], tiles[8], pieces_ord_list):
-        pieces["white"].append(piece_factory(piece_type=piece,
-                                            tile=wp_tile, is_white=True))
-        pieces["black"].append(piece_factory(piece_type=piece,
-                                            tile=bp_tile, is_white=False))
+    return pieces
 
-    for wp_tile, bp_tile in zip(tiles[1], tiles[7]):
-        pieces["white"].append(piece_factory(piece_type='pawn',
-                                            tile=wp_tile, is_white=True))
-        pieces["black"].append(piece_factory(piece_type='pawn',
-                                            tile=bp_tile, is_white=False))
+def asemble_board(file_pieces: dict, tiles: list, piece_factory: PieceFactory) -> dict:
+    pieces : dict[str, dict[str, list]] = {}
+    pieces["white"] = {}
+    for piece_name in file_pieces["pieces"]["white"]:
+        pieces["white"][piece_name] = []
+        for coords in file_pieces["pieces"]["white"][piece_name]:
+            pieces["white"][piece_name].append(
+                piece_factory(piece_name, tiles[coords[1]][coords[0]], True)
+            )
+
+    pieces["black"] = {}
+    for piece_name in file_pieces["pieces"]["black"]:
+        pieces["black"][piece_name] = []
+        for coords in file_pieces["pieces"]["black"][piece_name]:
+            pieces["black"][piece_name].append(
+                piece_factory(piece_name, tiles[coords[1]][coords[0]], False)
+            )
 
     return pieces
 
@@ -45,21 +56,25 @@ class Board:
     @property    
     def pieces(self):
         return self._pieces.copy()
-    
-    # def get_piece(self, tile_on: Tile, white:bool) -> Piece:
-    #     if white:
-    #         for piece in self._pieces['white']:
-    #             if piece.tile == tile_on else None
-            
+
+    def get_piece(self, white:bool, piece_name:str, coordx, coordy) -> Piece:
+        for piece in self._pieces["white" if white else "black"][piece_name]:
+            if piece.tile.coordx == coordx and piece.tile.coordy == coordy:
+                return piece
+
+        return None
+
 @dataclass
 class BoardFactory:
     tiles: list = field(init=False, repr=False)
     piece_factory: Type[PieceFactory] = field(init=False, repr=False, default_factory=PieceFactory)
     pieces: dict = field(init=False, repr=False)
+    board_file_path: str = field(repr=False)
 
     def __post_init__(self) -> None:
         self.tiles = tiles_factory(Tile)
-        self.pieces = pieces_position(self.tiles, self.piece_factory)
+        file_data = load_pieces(self.board_file_path)
+        self.pieces = asemble_board(file_data, self.tiles, self.piece_factory)
 
     def __call__(self) -> Board:
         return Board(self.tiles, self.pieces)
