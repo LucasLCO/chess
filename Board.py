@@ -23,14 +23,17 @@ def matrix_to_string(matrix:list) -> str:
 
     return formated_matrix
 
-PiecesDictionary = Dict[str, Union[Dict[str, List[Piece]], List[Piece]]]
-def assemble_board(file_pieces: dict, tiles: list, piece_factory: PieceFactory) -> PiecesDictionary:
+PiecesDictionary = Dict[str, Union[Dict[str, List[Piece]],
+                                    List[Piece]]]
+def assemble_board(file_pieces: dict, tiles: list,
+                    piece_factory: PieceFactory) -> PiecesDictionary:
     def iterate_file_pieces(color:str) -> None:
         pieces[color] = {}
         for piece_name in file_pieces["pieces"][color]:
             pieces[color][piece_name] = []
             for coords in file_pieces["pieces"][color][piece_name]:
-                piece = piece_factory(piece_name, tiles[coords[1]][coords[0]], True)
+                piece = piece_factory(piece_name,
+                                    tiles[coords[1]][coords[0]], True)
                 pieces[color][piece_name].append(piece)
                 pieces["all"].append(piece)
 
@@ -61,9 +64,12 @@ class Board:
     def pieces(self):
         return self._pieces.copy()
 
-    def get_white_piece(self,piece_color:str,  piece_name:str, coordx, coordy) -> Union[Piece, None]:
+    def get_white_piece(self,piece_color:str,  piece_name:str,
+                        coordx, coordy) -> Union[Piece, None]:
         for piece in self._pieces[piece_color][piece_name]:
-            if piece.tile.coordx == coordx and piece.tile.coordy == coordy:
+            if piece.tile.coordx == coordx \
+            and piece.tile.coordy == coordy:
+
                 return piece
 
         return None
