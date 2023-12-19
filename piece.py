@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from typing import Type
-from Tile import Tile
+from tile import Tile
 
 
 @dataclass

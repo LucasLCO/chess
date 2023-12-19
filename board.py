@@ -1,8 +1,8 @@
 from typing import Type, Union, Dict, List
 from dataclasses import dataclass, field
-from Piece import PieceFactory, Piece
+from piece import PieceFactory, Piece
 from utils import color
-from Tile import Tile
+from tile import Tile
 import json
 
 
@@ -46,6 +46,13 @@ def assemble_board(file_pieces: dict, tiles: list,
 
     return pieces
 
+def match_tile_piece(tile: Tile, pieces: PiecesDictionary) -> Union[Piece, None]:
+    for piece in pieces["all"]:
+        if piece.tile == tile:
+            return piece
+
+    return None
+
 class Board:
     def __init__(self, tiles: list, pieces: dict) -> None:
         self._tiles = tiles
@@ -62,7 +69,7 @@ class Board:
     def pieces(self):
         return self._pieces.copy()
 
-    def get_white_piece(self,piece_color:str,  piece_name:str,
+    def get_piece(self,piece_color:str,  piece_name:str,
                         coordx, coordy) -> Union[Piece, None]:
         for piece in self._pieces[piece_color][piece_name]:
             if piece.tile.coordx == coordx \
