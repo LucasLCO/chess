@@ -47,8 +47,6 @@ def assemble_board(file_pieces: dict, tiles: list,
     return pieces
 
 class Board:
-    BOARD_PADDING = 2
-
     def __init__(self, tiles: list, pieces: dict) -> None:
         self._tiles = tiles
         self._pieces = pieces
@@ -75,21 +73,26 @@ class Board:
         return None
 
     def __str__(self) -> str:
-        board = [[" " for _ in range(10)]
-                    for __ in range(10)]
+        INITIAL_NUMBER = 1
+        SCENE_PADDING = 2
+        SCENE_DIM = 10
+        BOARD_DIM = 8
 
-        for i in range(8):
-            board[9][9-i] = chr(ord('h')-i)
-            board[i][0] = i+1
+        board = [[" " for _ in range(SCENE_DIM)]
+                    for __ in range(SCENE_DIM)]
+
+        for i in range(BOARD_DIM):
+            board[-1][-1-i] = chr(ord('h')-i)
+            board[i][0] = i + INITIAL_NUMBER
 
         for row in self._tiles:
             for tile in row:
-                board[tile.coordy][tile.coordx+self.BOARD_PADDING] = \
+                board[tile.coordy][tile.coordx+SCENE_PADDING] = \
                 f"{color.fg_lightgreen}.{color.reset}" if not tile.white \
                 else f"{color.fg_green}{color.bg_black}.{color.reset}"
 
         for piece in self._pieces["all"]:
-            board[piece.tile.coordy][piece.tile.coordx+self.BOARD_PADDING] = \
+            board[piece.tile.coordy][piece.tile.coordx+SCENE_PADDING] = \
             f"{color.fg_lightgreen}{piece.name}{color.reset}" if not piece.white \
             else f"{color.fg_green}{color.bg_black}{piece.name}{color.reset}"
 
@@ -98,7 +101,9 @@ class Board:
 @dataclass
 class BoardFactory:
     tiles: list = field(init=False, repr=False)
-    piece_factory: Type[PieceFactory] = field(init=False, repr=False, default_factory=PieceFactory)
+    piece_factory: Type[PieceFactory] = field(init=False,
+                                            repr=False,
+                                            default_factory=PieceFactory)
     pieces: dict = field(init=False, repr=False)
     board_file_path: str = field(repr=False)
 
