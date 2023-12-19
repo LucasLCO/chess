@@ -1,50 +1,21 @@
+from typing import Type, Union, Dict, List
 from dataclasses import dataclass, field
 from Piece import PieceFactory, Piece
-from typing import Type, Union
+from utils import color
 from Tile import Tile
 import json
 
-class fg:
-    reset = '\033[0m'
-    black = '\033[30m'
-    red = '\033[31m'
-    green = '\033[32m'
-    orange = '\033[33m'
-    blue = '\033[34m'
-    purple = '\033[35m'
-    cyan = '\033[36m'
-    lightgrey = '\033[37m'
-    darkgrey = '\033[90m'
-    lightred = '\033[91m'
-    lightgreen = '\033[92m'
-    yellow = '\033[93m'
-    lightblue = '\033[94m'
-    pink = '\033[95m'
-    lightcyan = '\033[96m'
 
-class bg:
-    black = '\033[40m'
-    red = '\033[41m'
-    green = '\033[42m'
-    orange = '\033[43m'
-    blue = '\033[44m'
-    purple = '\033[45m'
-    cyan = '\033[46m'
-    lightgrey = '\033[47m'
-
-
-def tiles_factory(tile: Type[Tile]) -> list:
+def assemble_tiles(tile: Type[Tile]) -> list:
     return [[tile(x, y)
             for x in range(8)]
             for y in range(8)]
 
 def load_pieces(path:str) -> dict:
     with open(path) as file:
-        pieces = json.load(file)
+        return json.load(file)
 
-    return pieces
-
-def matrix_to_string(matrix:str) -> list:
+def matrix_to_string(matrix:list) -> str:
     formated_matrix = ""
     for row in matrix:
         formatted_row = " ".join(map(str, row))
@@ -52,29 +23,29 @@ def matrix_to_string(matrix:str) -> list:
 
     return formated_matrix
 
-def asemble_board(file_pieces: dict, tiles: list, piece_factory: PieceFactory) -> dict:
-    pieces = {}
-    pieces["all"] = []
-    pieces["white"] = {}
-    for piece_name in file_pieces["pieces"]["white"]:
-        pieces["white"][piece_name] = []
-        for coords in file_pieces["pieces"]["white"][piece_name]:
-            piece = piece_factory(piece_name, tiles[coords[1]][coords[0]], True)
-            pieces["white"][piece_name].append(piece)
-            pieces["all"].append(piece)
+PiecesDictionary = Dict[str, Union[Dict[str, List[Piece]], List[Piece]]]
+def assemble_board(file_pieces: dict, tiles: list, piece_factory: PieceFactory) -> PiecesDictionary:
+    def iterate_file_pieces(color:str) -> None:
+        pieces[color] = {}
+        for piece_name in file_pieces["pieces"][color]:
+            pieces[color][piece_name] = []
+            for coords in file_pieces["pieces"][color][piece_name]:
+                piece = piece_factory(piece_name, tiles[coords[1]][coords[0]], True)
+                pieces[color][piece_name].append(piece)
+                pieces["all"].append(piece)
 
+    pieces: PiecesDictionary = {
+                "all":[]
+            }
 
-    pieces["black"] = {}
-    for piece_name in file_pieces["pieces"]["black"]:
-        pieces["black"][piece_name] = []
-        for coords in file_pieces["pieces"]["black"][piece_name]:
-            piece = piece_factory(piece_name, tiles[coords[1]][coords[0]], False)
-            pieces["black"][piece_name].append(piece)
-            pieces["all"].append(piece)
+    iterate_file_pieces("white")
+    iterate_file_pieces("black")
 
     return pieces
 
 class Board:
+    BOARD_PADDING = 2
+
     def __init__(self, tiles: list, pieces: dict) -> None:
         self._tiles = tiles
         self._pieces = pieces
@@ -90,23 +61,16 @@ class Board:
     def pieces(self):
         return self._pieces.copy()
 
-    def get_white_piece(self, piece_name:str, coordx, coordy) -> Union[Piece, None]:
-        for piece in self._pieces["white"][piece_name]:
-            if piece.tile.coordx == coordx and piece.tile.coordy == coordy:
-                return piece
-
-        return None
-
-    def get_black_piece(self, piece_name:str, coordx, coordy) -> Union[Piece, None]:
-        for piece in self._pieces["black"][piece_name]:
+    def get_white_piece(self,piece_color:str,  piece_name:str, coordx, coordy) -> Union[Piece, None]:
+        for piece in self._pieces[piece_color][piece_name]:
             if piece.tile.coordx == coordx and piece.tile.coordy == coordy:
                 return piece
 
         return None
 
     def __str__(self) -> str:
-        board = [[" " for x in range(10)]
-                    for y in range(10)]
+        board = [[" " for _ in range(10)]
+                    for __ in range(10)]
 
         for i in range(8):
             board[9][9-i] = chr(ord('h')-i)
@@ -114,14 +78,14 @@ class Board:
 
         for row in self._tiles:
             for tile in row:
-                board[tile.coordy][tile.coordx+2] = \
-                f"{fg.lightgreen}.{fg.reset}" if not tile.white \
-                else f"{fg.green}{bg.black}.{fg.reset}"
+                board[tile.coordy][tile.coordx+self.BOARD_PADDING] = \
+                f"{color.fg_lightgreen}.{color.reset}" if not tile.white \
+                else f"{color.fg_green}{color.bg_black}.{color.reset}"
 
         for piece in self._pieces["all"]:
-            board[piece.tile.coordy][piece.tile.coordx+2] = \
-            f"{fg.lightgreen}{piece.name}{fg.reset}" if not piece.white \
-            else f"{fg.green}{bg.black}{piece.name}{fg.reset}"
+            board[piece.tile.coordy][piece.tile.coordx+self.BOARD_PADDING] = \
+            f"{color.fg_lightgreen}{piece.name}{color.reset}" if not piece.white \
+            else f"{color.fg_green}{color.bg_black}{piece.name}{color.reset}"
 
         return matrix_to_string(board)
 
@@ -133,9 +97,9 @@ class BoardFactory:
     board_file_path: str = field(repr=False)
 
     def __post_init__(self) -> None:
-        self.tiles = tiles_factory(Tile)
+        self.tiles = assemble_tiles(Tile)
         file_data = load_pieces(self.board_file_path)
-        self.pieces = asemble_board(file_data, self.tiles, self.piece_factory)
+        self.pieces = assemble_board(file_data, self.tiles, self.piece_factory)
 
     def __call__(self) -> Board:
         return Board(self.tiles, self.pieces)
