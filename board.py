@@ -1,6 +1,6 @@
 from typing import Type, Union, Dict, List
 from dataclasses import dataclass, field
-from piece import PieceFactory, Piece
+from pieces import PieceFactory, Piece
 from utils import color
 from tile import Tile
 import json
