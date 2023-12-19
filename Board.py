@@ -88,13 +88,13 @@ class Board:
         for row in self._tiles:
             for tile in row:
                 board[tile.coordy][tile.coordx+SCENE_PADDING] = \
-                f"{color.fg_lightgreen}.{color.reset}" if not tile.white \
-                else f"{color.fg_green}{color.bg_black}.{color.reset}"
+                f"{color.FG_LIGHTGREEN}.{color.RESET}" if not tile.white \
+                else f"{color.FG_GREEN}{color.BG_BLACK}.{color.RESET}"
 
         for piece in self._pieces["all"]:
             board[piece.tile.coordy][piece.tile.coordx+SCENE_PADDING] = \
-            f"{color.fg_lightgreen}{piece.name}{color.reset}" if not piece.white \
-            else f"{color.fg_green}{color.bg_black}{piece.name}{color.reset}"
+            f"{color.FG_LIGHTGREEN}{piece.name}{color.RESET}" if not piece.white \
+            else f"{color.FG_GREEN}{color.BG_BLACK}{piece.name}{color.RESET}"
 
         return matrix_to_string(board)
 

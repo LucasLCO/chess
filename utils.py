@@ -1,6 +1,6 @@
 class color:
-    reset = '\033[0m'
-    fg_lightgrey = '\033[37m'
-    fg_lightgreen = '\033[92m'
-    bg_black = '\033[40m'
-    fg_green = '\033[32m'
+    RESET = '\033[0m'
+    FG_LIGHTGREY = '\033[37m'
+    FG_LIGHTGREEN = '\033[92m'
+    FG_GREEN = '\033[32m'
+    BG_BLACK = '\033[40m'
