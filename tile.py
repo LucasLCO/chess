@@ -43,8 +43,8 @@ class Tiles:
             tiles_pieces.append(piece.tile)
 
         return tiles_pieces
-    
+
     def get_empty_tiles(self, pieces:list) -> List[Tile]:
-        tiles_pieces = self.tiles_with_pieces(pieces)
-    
+        tiles_pieces = self.get_tiles_with_pieces(pieces)
+
         return [tile for tile in self.all if tile not in tiles_pieces]
