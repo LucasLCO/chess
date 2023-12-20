@@ -3,3 +3,4 @@ from .piece import Piece
 
 from .pieces import Pieces
 from .pieces import PiecesFactory
+from .pieces import PieceGroup
