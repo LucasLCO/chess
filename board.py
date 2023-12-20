@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
-from pieces import PieceFactory, Pieces ,PiecesFactory
-from tile import Tile, tiles_factory
-from typing import Type, Union
+from pieces import PieceFactory, Pieces, PiecesFactory
+from typing import Type
+from tile import Tiles
 import json
 
 
@@ -12,7 +12,7 @@ class Color:
     FG_GREEN = '\033[32m'
     BG_BLACK = '\033[40m'
 
-def load_pieces(path:str) -> dict:
+def load_board(path:str) -> dict:
     with open(path) as file:
         return json.load(file)
 
@@ -29,9 +29,6 @@ class Board:
         self.tiles = tiles
         self.pieces = pieces
 
-    def get_tile(self, coordx, coordy) -> Tile:
-        return self.tiles[coordy][coordx]
-
     def __str__(self) -> str:
         INITIAL_NUMBER = 1
         CANVAS_PADDING = 2
@@ -45,11 +42,10 @@ class Board:
             board[-1][-1-i] = chr(ord('h')-i)
             board[i][0] = i + INITIAL_NUMBER
 
-        for row in self.tiles:
-            for tile in row:
-                board[tile.coordy][tile.coordx+CANVAS_PADDING] = \
-                f"{Color.FG_LIGHTGREEN}.{Color.RESET}" if not tile.white \
-                else f"{Color.FG_GREEN}{Color.BG_BLACK}.{Color.RESET}"
+        for tile in self.tiles.all:
+            board[tile.coordy][tile.coordx+CANVAS_PADDING] = \
+            f"{Color.FG_LIGHTGREEN}.{Color.RESET}" if not tile.white \
+            else f"{Color.FG_GREEN}{Color.BG_BLACK}.{Color.RESET}"
 
         for piece in self.pieces.all:
             board[piece.tile.coordy][piece.tile.coordx+CANVAS_PADDING] = \
@@ -58,19 +54,15 @@ class Board:
 
         return matrix_to_string(board)
 
-@dataclass
 class BoardFactory:
-    tiles: list = field(init=False, repr=False)
-    piece_factory: Type[PieceFactory] = field(init=False,
-                                            repr=False,
-                                            default_factory=PieceFactory)
-    pieces: dict = field(init=False, repr=False)
-    board_file_path: str = field(repr=False)
-
-    def __post_init__(self) -> None:
-        self.tiles = tiles_factory()
-        file_data = load_pieces(self.board_file_path)
-        # self.pieces = assemble_board(file_data, self.tiles, self.piece_factory
+    def __init__(self, board_file_path) -> None:
+        self._file_data = load_board(board_file_path)
+        self._tiles = Tiles()
+        self._piece_factory = PieceFactory()
+        self._pieces_factory = PiecesFactory(self._file_data,
+                                            self._tiles,
+                                            self._piece_factory)
+        self._pieces = self._pieces_factory()
 
     def __call__(self) -> Board:
-        return Board(self.tiles, self.pieces)
+        return Board(self._tiles, self._pieces)

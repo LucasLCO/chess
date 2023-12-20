@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 from pieces import PieceFactory, Piece
 from typing import List, Union
+from tile import Tile, Tiles
 from itertools import chain
-from tile import Tile
 
 @dataclass
 class PieceGroup:
@@ -27,7 +27,7 @@ class Pieces:
     @property
     def all(self) -> List[Piece]:
         return self.white.all + self.black.all
-    
+
     def match_tile_piece(self, tile: Tile) -> Union[Piece, None]:
         for piece in self.all:
             if piece.tile == tile:
@@ -37,18 +37,18 @@ class Pieces:
 
 class PiecesFactory():
     def __init__(self, piece_file_data: dict,
-                tiles: list, piece_factory: PieceFactory) -> None:
+                tiles: Tiles, piece_factory: PieceFactory) -> None:
         self._piece_file_data = piece_file_data
         self._tiles = tiles
         self._piece_factory = piece_factory
 
-    def __call__(self):
+    def __call__(self) -> Pieces:
         pieces = Pieces()
-        def iterate_file_pieces(piece_group:PieceGroup) -> Pieces:
+        def iterate_file_pieces(piece_group:PieceGroup) -> None:
             for piece_name in self._piece_file_data["pieces"][piece_group.color]:
                 for coords in self._piece_file_data["pieces"][piece_group.color][piece_name]:
                     piece = self._piece_factory(piece_name,
-                                        self._tiles[coords[1]][coords[0]],
+                                        self._tiles.get_tile(*coords),
                                         piece_group.color=="white")
 
                     vars(piece_group)[piece_name].append(piece)
