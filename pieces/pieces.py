@@ -35,7 +35,6 @@ class Pieces:
 
         return None
 
-
 class PiecesFactory():
     def __init__(self, piece_file_data: dict,
                 tiles: list, piece_factory: PieceFactory) -> None:
