@@ -4,6 +4,7 @@ from typing import List, Union
 from tile import Tile, Tiles
 from itertools import chain
 
+
 @dataclass
 class PieceGroup:
     color: str

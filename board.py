@@ -1,6 +1,5 @@
-from dataclasses import dataclass, field
 from pieces import PieceFactory, Pieces, PiecesFactory
-from typing import Type
+from dataclasses import dataclass
 from tile import Tiles
 import json
 
@@ -49,12 +48,12 @@ class BoardRenderer:
 
         for tile in self.board.tiles.all:
             board[tile.coordy][tile.coordx+CanvasConfig.CANVAS_PADDING] = \
-            f"{Color.FG_LIGHTGREEN}.{Color.RESET}" if not tile.white \
+            f"{Color.FG_LIGHTGREEN}.{Color.RESET}" if tile.white \
             else f"{Color.FG_GREEN}{Color.BG_BLACK}.{Color.RESET}"
 
         for piece in self.board.pieces.all:
             board[piece.tile.coordy][piece.tile.coordx+CanvasConfig.CANVAS_PADDING] = \
-            f"{Color.FG_LIGHTGREEN}{piece.name}{Color.RESET}" if not piece.white \
+            f"{Color.FG_LIGHTGREEN}{piece.name}{Color.RESET}" if piece.white \
             else f"{Color.FG_GREEN}{Color.BG_BLACK}{piece.name}{Color.RESET}"
 
         return matrix_to_string(board)

@@ -1,67 +1,43 @@
 from dataclasses import dataclass, field
-from abc import ABC, abstractmethod
-from typing import Type
 from tile import Tile
 
 
 @dataclass
-class Piece(ABC):
+class Piece:
     name: str = field(repr=False)
-    tile: Type[Tile]
+    tile: Tile
     white: bool
     value: int = field(init=False)
-
-    @abstractmethod
-    def possible_movement(self) -> tuple:
-        pass
 
 @dataclass
 class Pawn(Piece):
     value: int = field(default=1,
                 init=False, repr=False)
 
-    def possible_movement(self) -> tuple:
-        pass
-
 @dataclass
 class Knight(Piece):
     value: int = field(default=3,
                 init=False, repr=False)
-
-    def possible_movement(self) -> tuple:
-        pass
 
 @dataclass
 class Bishop(Piece):
     value: int = field(default=3,
                 init=False, repr=False)
 
-    def possible_movement(self) -> tuple:
-        pass
-
 @dataclass
 class Rook(Piece):
     value: int = field(default=5,
                 init=False, repr=False)
-
-    def possible_movement(self) -> tuple:
-        pass
 
 @dataclass
 class Queen(Piece):
     value: int = field(default=9,
                 init=False, repr=False)
 
-    def possible_movement(self) -> tuple:
-        pass
-
 @dataclass
 class King(Piece):
     value: None = field(default=None,
                 init=False, repr=False)
-
-    def possible_movement(self) -> tuple:
-        pass
 
 class PieceFactory:
     factories = {
