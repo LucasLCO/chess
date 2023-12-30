@@ -1,28 +1,45 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from tile import Tile, Tiles
 from enum import Enum, auto
-from typing import Type
-from tile import Tile
+from pieces import Piece
 
-# Instead of each piece to have
-# the move described inside their
-# own class, maybe the Move class
-# should have implemented the specifics
-# move calculators.
+
+def pawn(tile: Tile, tiles: Tiles) -> list:
+    return [tiles.get_tile(tile.coordx, tile.coordy+1),
+            tiles.get_tile(tile.coordx+1, tile.coordy+1),
+            tiles.get_tile(tile.coordx-1, tile.coordy+1)]
+
+def knight(tile: Tile, tiles: Tiles) -> list:
+    pass
+
+def bishop(tile: Tile, tiles: Tiles) -> list:
+    pass
+
+def rook(tile: Tile, tiles: Tiles) -> list:
+    pass
+
+def queen(tile: Tile, tiles: Tiles) -> list:
+    pass
+
+def king(tile: Tile, tiles: Tiles) -> list:
+    pass
 
 class MoveState(Enum):
     POSSIBLE = auto()
-    NOT_POSSIBLE = auto()
+    ATACK = auto()
 
-def is_atack(where: Tile) -> bool:
-    pass
+class MoveHandler:
+    piece_dict = {
+        "P": pawn
+    }
+    
+    def __init__(self, tiles: Tiles) -> None:
+        self.tiles = tiles
 
-@dataclass
-class Move:
-    where: Type[Tile]
-    state: Type[MoveState]
-    atack: bool = field(init=False)
-    
-    def __post_init__(self):
-        self.atack = is_atack(self.where)
-    
-# Use enums to change the state of the tiles
+    def __call__(self, piece: Piece, tile_to: Tile) -> bool:   
+        possible_tiles = self.piece_dict[piece.name](piece.tile, self.tiles)
+        if tile_to in possible_tiles:
+            piece.tile = tile_to
+            return True
+        return False
+
